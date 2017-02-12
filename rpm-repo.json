@@ -1,0 +1,84 @@
+{
+   "variables": 
+   {
+      "version"   : "1",
+      "chef_dir"  : "",
+      "chef_env"  : "dev",
+      "home"      : "{{env `HOME`}}"
+   },
+
+   "builders":
+   [
+      {
+         "type"   : "docker",
+         "image"  : "centos:centos6.8",
+         "pull"   : false,
+         "commit" : true
+      }
+   ],
+
+   "provisioners":
+   [
+
+     {
+       "type": "file",
+       "source": "rpms/clotho-1.0-3.x86_64.rpm",
+       "destination": "/clotho-1.0-3.x86_64.rpm"
+     },
+
+     {
+       "type": "file",
+       "source": "rpms/runit-2.1.2-1.el6.x86_64.rpm",
+       "destination": "/runit-2.1.2-1.el6.x86_64.rpm"
+     },
+
+     {
+       "type": "file",
+       "source": "rpms/runit-debuginfo-2.1.2-1.el6.x86_64.rpm",
+       "destination": "/runit-debuginfo-2.1.2-1.el6.x86_64.rpm"
+     },
+
+     {
+        "type": "shell",
+        "inline":
+        [
+           "rpm -ivh --nosignature /*.rpm",
+           "yum install -q -y epel-release yum-utils createrepo httpd",
+           "mkdir -p /mnt/repository/",
+           "mkdir -p /etc/service/repo/",
+           "createrepo --database /mnt/repository"
+        ]
+     },
+
+     {
+       "type": "file",
+       "source": "repo.conf",
+       "destination": "/etc/httpd/conf.d/repo.conf"
+     },
+
+     {
+       "type": "file",
+       "source": "run",
+       "destination": "/etc/service/repo/run"
+     },
+
+     {
+       "type": "shell",
+       "inline":
+       [
+         "chmod 777 /etc/service/repo/run"
+       ]
+     }
+
+   ],
+
+  "post-processors":
+  [
+    {
+      "type"         : "docker-tag",
+      "repository"   : "gavalioti/rpm-repo",
+      "force"        : false,
+      "tag"          : "latest"
+    }
+  ]
+}

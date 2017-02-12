@@ -1,0 +1,6 @@
+[cerberus]
+name=My Repository
+baseurl=http://my.repo.com/CentOS/6.8/os/x86_64/
+enabled=1
+gpgcheck=0
+gpgkey=http://my.repo.com/CentOS/6.8/os/x86_64/RPM-GPG-KEY-myrepo

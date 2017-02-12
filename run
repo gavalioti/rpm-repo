@@ -1,0 +1,4 @@
+#!/bin/sh
+exec 2>&1
+createrepo --update /mnt/repository
+exec /usr/sbin/httpd -DNO_DETACH
